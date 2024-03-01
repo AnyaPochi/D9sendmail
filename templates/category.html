@@ -4,18 +4,21 @@
 {% load custom_tags %}
 <!-- Название у нас будет products -->
 {% block title %}
-Posts
+Category
 {% endblock title %}
 
 <!-- В контенте на странице мы выводим все статьи -->
 {% block content %}
+    {% if is_not_subscriber %}
+            <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn-secondary btn-sm">Подписаться</a></p>
+    {% endif %}
     <h1>Все статьи</h1>
     <h3>{{ time_now|date:'d M Y' }}</h3>
     <h3> {{ posts|length }} </h3>
     <hr>
 
 
-   {% if posts %}
+   {% if category_list %}
        <table>
            <tr>
                <td>Заголовок</td>
@@ -26,12 +29,20 @@ Posts
            </tr>
 
 
-           {% for post in posts %}
+           {% for post in category_list %}
            <tr>
-               <td>{{ post.title|censor }}</td>
-               <td>{{ post.time_in|date:'d M Y' }}</td>
-               <td>{{ post.text|truncatechars:20|censor }}</td>
-               <td>{{ post.type }}</td>
+               <td>
+                   {{ post.title|censor }}
+               </td>
+               <td>
+                   {{ post.time_in|date:'d M Y' }}
+               </td>
+               <td>
+                   {{ post.text|truncatechars:20|censor }}
+               </td>
+               <td>
+                   {{ post.type }}
+               </td>
                <td>
                    {% for category in post.category.all %}
                        <a href="{% url 'categories_list' category.id %}"> {{category}}</a>

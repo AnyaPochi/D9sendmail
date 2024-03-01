@@ -5,36 +5,20 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Post
+from .models import Post, Category
 from .forms import PostForm
 from datetime import datetime
 from .filters import PostFilter
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import get_object_or_404,render
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+
 class PostsList(ListView):
-    # Указываем модель, объекты которой мы будем выводить
-    # model = Post
-    # # Поле, которое будет использоваться для сортировки объектов
-    # ordering = 'title'
-    # Указываем имя шаблона, в котором будут все инструкции о том,
-    # как именно пользователю должны быть показаны наши объекты
     queryset = Post.objects.order_by('-time_in')
     template_name = 'posts.html'
-    # Это имя списка, в котором будут лежать все объекты.
-    # Его надо указать, чтобы обратиться к списку объектов в html-шаблоне.
     context_object_name = 'posts'
     paginate_by = 10
-
-    # def get_queryset(self):
-    #     # Получаем обычный запрос
-    #     queryset = super().get_queryset()
-    #     # Используем наш класс фильтрации.
-    #     # self.request.GET содержит объект QueryDict, который мы рассматривали
-    #     # в этом юните ранее.
-    #     # Сохраняем нашу фильтрацию в объекте класса,
-    #     # чтобы потом добавить в контекст и использовать в шаблоне.
-    #     self.filterset = PostFilter(self.request.GET, queryset)
-    #     # Возвращаем из функции отфильтрованный список товаров
-    #     return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,10 +26,8 @@ class PostsList(ListView):
         return context
 
 class PostDetail(DetailView):
-    # Модель всё та же, но мы хотим получать информацию по отдельному товару
     queryset = Post.objects.order_by('-time_in')
     template_name = 'post.html'
-    # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'posts'
 
     def get_context_data(self, **kwargs):
@@ -59,30 +41,18 @@ class PostsSearch(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        # Получаем обычный запрос
         queryset = super().get_queryset()
-        # Используем наш класс фильтрации.
-        # self.request.GET содержит объект QueryDict, который мы рассматривали
-        # в этом юните ранее.
-        # Сохраняем нашу фильтрацию в объекте класса,
-        # чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = PostFilter(self.request.GET, queryset)
-        # Возвращаем из функции отфильтрованный список товаров
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
 
         return context
-# Добавляем новое представление для создания товаров.
 class PostCreate(CreateView):
-    # Указываем нашу разработанную форму
     form_class = PostForm
-    # модель товаров
     model = Post
-    # и новый шаблон, в котором используется форма.
     template_name = 'post_edit.html'
 
     def form_valid(self, form):
@@ -106,3 +76,26 @@ class AddPost(PermissionRequiredMixin, PostCreate):
 
 class ChangePost(PermissionRequiredMixin, PostUpdate):
     permission_required = ('news.change_post')
+
+
+class CategoryList(PostsList):
+    model = Post
+    template_name = 'category.html'
+    context_object_name = 'category_list'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = Post.objects.filter(category=self.category)
+        return queryset
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
+@login_required
+def subscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.add(user)
+    message = 'Вы подписали на рассылку новостей в категории'
+    return render(request, 'subscribe.html', {'category':category,'message': message})

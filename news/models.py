@@ -34,6 +34,12 @@ class Author(models.Model):
 # Модель Category
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    subscribers = models.ManyToManyField(User, blank=True,null=True, related_name='categories')
+    def __str__(self):
+        return self.name
+class UserCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    categoty_id = models.ForeignKey(Category, on_delete=models.CASCADE)
     # subscribers =models.ManyToManyField(User,through='User')
 
 
@@ -80,6 +86,9 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post', args=[str(self.id)])
+
+
+
 
 # Модель PostCategory
 class PostCategory(models.Model):
