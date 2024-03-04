@@ -2,15 +2,15 @@
 {% extends 'flatpages/default.html' %}
 {% load custom_filters %}
 {% load custom_tags %}
-<!-- Название у нас будет products -->
+
 {% block title %}
 Category
 {% endblock title %}
 
-<!-- В контенте на странице мы выводим все статьи -->
+
 {% block content %}
     {% if is_not_subscriber %}
-            <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn-secondary btn-sm">Подписаться</a></p>
+        <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn-secondary btn-sm">Подписаться</a></p>
     {% endif %}
     <h1>Все статьи</h1>
     <h3>{{ time_now|date:'d M Y' }}</h3>
@@ -18,7 +18,7 @@ Category
     <hr>
 
 
-   {% if category_list %}
+   {% if category_news_list %}
        <table>
            <tr>
                <td>Заголовок</td>
@@ -29,7 +29,7 @@ Category
            </tr>
 
 
-           {% for post in category_list %}
+           {% for post in category_news_list %}
            <tr>
                <td>
                    {{ post.title|censor }}
@@ -45,7 +45,7 @@ Category
                </td>
                <td>
                    {% for category in post.category.all %}
-                       <a href="{% url 'categories_list' category.id %}"> {{category}}</a>
+                       <a href="{% url 'category_list' category.id %}"> {{category}}</a>
                    {% endfor %}
                </td>
            </tr>

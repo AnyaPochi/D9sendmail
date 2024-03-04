@@ -34,7 +34,7 @@ Posts
                <td>{{ post.type }}</td>
                <td>
                    {% for category in post.category.all %}
-                       <a href="{% url 'categories_list' category.id %}"> {{category}}</a>
+                       <a href="{% url 'category_list' category.id %}"> {{category}}</a>
                    {% endfor %}
                </td>
            </tr>

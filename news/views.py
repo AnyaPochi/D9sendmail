@@ -78,10 +78,10 @@ class ChangePost(PermissionRequiredMixin, PostUpdate):
     permission_required = ('news.change_post')
 
 
-class CategoryList(PostsList):
+class CategoryListView(PostsList):
     model = Post
-    template_name = 'category.html'
-    context_object_name = 'category_list'
+    template_name = 'category_list.html'
+    context_object_name = 'category_news_list'
 
     def get_queryset(self):
         self.category = get_object_or_404(Category, id=self.kwargs['pk'])

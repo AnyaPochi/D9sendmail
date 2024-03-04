@@ -40,24 +40,24 @@ class Category(models.Model):
 class UserCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     categoty_id = models.ForeignKey(Category, on_delete=models.CASCADE)
-    # subscribers =models.ManyToManyField(User,through='User')
 
 
-    def __str__(self):
-        return self.name.title()
+    # def __str__(self):
+    #     return self.name.title()
 
 
 # #Модель Post
 
-POSITIONS = [
-    (1, 'Статья'),
-    (2, 'Новость')
-]
-
 
 class Post(models.Model):
+    NEWS = 'NW'
+    ARTICLE = "AR"
+    POSITIONS = [
+        (NEWS, 'Новость'),
+        (ARTICLE, 'Статья')
+    ]
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    type = models.CharField(max_length=20, choices=POSITIONS, default='Новость')
+    type = models.CharField(max_length=20, choices=POSITIONS, default=NEWS)
     time_in = models.DateTimeField(auto_now_add=True)
     category = models.ManyToManyField(Category, through='PostCategory')
     title = models.CharField(
@@ -79,7 +79,7 @@ class Post(models.Model):
     # Метод preview() модели Post, который возвращает
     # начало статьи (предварительный просмотр) длиной 124 символа и добавляет многоточие в конце.
     def __str__(self):
-        return self.title.title()
+        return self.title
 
     def preview(self):
         return f'{self.text[:123]}...'
@@ -87,6 +87,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post', args=[str(self.id)])
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # cache.delete(f'post-{self.pk}')
 
 
 
