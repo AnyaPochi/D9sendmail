@@ -27,8 +27,8 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     # 'flatpages',
     'django_filters',
-    'sign',
-    'protect',
+    # 'sign',
+    # 'protect',
 
     'allauth',
     'allauth.account',

@@ -4,12 +4,14 @@ from django.core.exceptions import ValidationError
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
 from django import forms
+
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
-# from django.template.loader import render_to_string
-# from django.core.mail import EmailMultiAlternatives
-# from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -44,7 +46,7 @@ class PostForm(forms.ModelForm):
 #                   "password1",
 #                   "password2", )
 #
-#
+
 # class BasicSignupForm(SignupForm):
 #
 #     def save(self, request):
